@@ -1,47 +1,90 @@
 import React from "react";
 import { useState } from "react";
+import { FaTrashAlt } from "react-icons/fa";
+import "./index.css";
 
 // Content is a different type of component
 
 const Content = () => {
   // current state of our app
-  const [name, setName] = useState("Faisal");
-  const [count, setCount] = useState(0);
+  const [items, setItems] = useState([
+    {
+      id: 1,
+      checked: false,
+      item: "One half pound of Cocoa covered Almonds Unsalted",
+    },
+    {
+      id: 2,
+      checked: true,
+      item: "Item 2",
+    },
+    {
+      id: 3,
+      checked: false,
+      item: "Item 3",
+    },
+  ]);
 
-  // this will automatically create a function
-  //   this function will change the state
-  //  and cause the component to re-render with
-  // the new state.
-  const handleNameChange = () => {
-    const names = ["Faisal", "Lawan", "Muhammad"];
-    const int = Math.floor(Math.random() * 3);
-    setName(names[int]);
-  };
-
-  //  the event is saved as e
-  // e is used to save the current html element
-  // that is being worked on.
-  const handleClick = () => {
-    // cout the value of the current state.
-    setCount(count + 1);
-    console.log(count);
-  };
-
-  const handleClick2 = () => {
-    console.log(count);
+  function handleCheck(id) {
+    // iterating through the list of items and making...
+    // the neccessary changes.
+    const listItems = items.map((item) =>
+      item.id == id ? { ...item, checked: !item.checked } : item
+    );
+    console.log(listItems);
+    setItems(listItems);
+    // to make our state persistent we will use localstorage
+    localStorage.setItem("shoppinglist", JSON.stringify(listItems));
   }
+
+  const handleDelete = (id) => {
+
+    // this array will only have items with the id...
+    // not equal to the item id.
+    const listItems = items.filter((item) => item.id !== id);
+    setItems(listItems);
+
+  };
 
   return (
     <main>
-      {/* this name variable is a state */}
-      <p>Hello {name}!</p>
+        {items.length ? (
+      <ul>
+        {items.map((item) => (
+          <li className="item" key={item.id}>
+            <input
+              type="checkbox"
+              onChange={() => {
+                handleCheck(item.id);
+              }}
+              checked={item.checked}
+            />
 
-      <button onClick={handleNameChange}>Change the name</button>
-      <button onClick={handleClick}>click it!</button>
-      <button onClick={handleClick2}>click it2!</button>
+            <label
+              style={item.checked ? { textDecoration: "line-through" } : null}
+              onDoubleClick={() => {
+                handleCheck(item.id);
+              }}
+            >
+              {item.item}
+            </label>
+
+            <FaTrashAlt
+              role="button"
+              tabIndex="0"
+              onClick={() => {
+                handleDelete(item.id);
+              }}
+            />
+          </li>
+        ))}
+      </ul>): (
+        <p style={{ marginTop: '2rem' }}>
+            Your list is empty
+        </p>
+      )}
     </main>
   );
-
 };
 
 export default Content;
